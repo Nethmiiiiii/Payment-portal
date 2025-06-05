@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New Payment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                    linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
+                    url('/images/background1.jpg') center center / cover no-repeat fixed;
+            filter: blur(5px);
+            z-index: -1;
+        }
+        .navbar {
+            background-color: #123458;
+        }
+        .navbar-brand, .nav-link {
+            color: #F1EFEC !important;
+        }
+        .card {
+            background-color: #F1EFEC;
+            border-color: #D4C9BE;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .btn-primary {
+            background-color: #123458;
+            border-color: #123458;
+        }
+        h1, h2, h3 {
+            color: #030303;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .card-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+        .is-invalid {
+            border-color: #dc3545;
+        }
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="bi bi-credit-card"></i> Payment System
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/payments"><i class="bi bi-list-ul"></i> Payments</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/payments/new"><i class="bi bi-plus-circle"></i> New Payment</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="card-title mb-4"><i class="bi bi-plus-circle"></i> New Payment</h1>
+
+            <form th:action="@{/payments/save}" th:object="${payment}" method="post" id="paymentForm">
+                <div class="mb-3">
+                    <label for="propertyId" class="form-label">Property ID</label>
+                    <input type="text" class="form-control" id="propertyId" th:field="*{propertyId}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="buyerEmail" class="form-label">Buyer Email</label>
+                    <input type="email" class="form-control" id="buyerEmail" th:field="*{buyerEmail}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount</label>
+                    <div class="input-group">
+                        <span class="input-group-text">LKR</span>
+                        <input type="number" step="0.01" min="0" class="form-control" id="amount" th:field="*{amount}" required>
+                    </div>
+                </div>
+
+                <!-- Card Payment Section -->
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <i class="bi bi-credit-card"></i> Card Details
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Card Type</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="cardType" id="creditCard" value="credit" th:field="*{cardType}" required>
+                                <label class="form-check-label" for="creditCard">
+                                    <i class="bi bi-credit-card card-icon"></i> Credit Card
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="cardType" id="debitCard" value="debit" th:field="*{cardType}">
+                                <label class="form-check-label" for="debitCard">
+                                    <i class="bi bi-credit-card-2-back card-icon"></i> Debit Card
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cardHolderName" class="form-label">Card Holder Name</label>
+                            <input type="text" class="form-control" id="cardHolderName" th:field="*{cardHolderName}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cardNumber" class="form-label">Card Number</label>
+                            <input type="text" class="form-control" id="cardNumber" name="cardNumber"
+                                   maxlength="19" placeholder="1234 1234 1234 1234" required>
+                            <small class="text-muted">Enter 16-digit card number</small>
+                            <div class="invalid-feedback" id="cardNumberError">Please enter a valid 16-digit card number</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="cardExpiry" class="form-label">Expiry Date</label>
+                                <input type="text" class="form-control" id="cardExpiry" name="cardExpiry"
+                                       placeholder="MM/YY" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="cardCvc" class="form-label">CVC</label>
+                                <input type="text" class="form-control" id="cardCvc" name="cardCvc"
+                                       maxlength="3" placeholder="123" required>
+                                <small class="text-muted">3 digits on back of card</small>
+                                <div class="invalid-feedback" id="cvcError">Please enter a valid 3-digit CVC</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="paymentMethod" class="form-label">Card Brand</label>
+                                <select class="form-select" id="paymentMethod" th:field="*{paymentMethod}" required>
+                                    <option value="">Select brand</option>
+                                    <option value="Visa">Visa</option>
+                                    <option value="MasterCard">MasterCard</option>
+                                    <option value="American Express">American Express</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="/payments" class="btn btn-outline-secondary me-md-2">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="bi bi-save"></i> Process Payment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cardNumberInput = document.getElementById('cardNumber');
+        const cvcInput = document.getElementById('cardCvc');
+        const expiryInput = document.getElementById('cardExpiry');
+        const form = document.getElementById('paymentForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Format card number with spaces
+        cardNumberInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
+            let formatted = '';
+
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formatted += ' ';
+                }
+                formatted += value[i];
+            }
+
+            e.target.value = formatted.substring(0, 19);
+
+            // Validate length (16 digits without spaces)
+            const isValid = value.length === 16;
+            if (isValid) {
+                e.target.classList.remove('is-invalid');
+            } else {
+                e.target.classList.add('is-invalid');
+            }
+        });
+
+        // Validate CVC (exactly 3 digits)
+        cvcInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            e.target.value = value.substring(0, 3);
+
+            const isValid = value.length === 3;
+            if (isValid) {
+                e.target.classList.remove('is-invalid');
+            } else {
+                e.target.classList.add('is-invalid');
+            }
+        });
+
+        // Format expiry date as MM/YY
+        expiryInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value.substring(0, 5);
+        });
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+
+            // Validate card number (exactly 16 digits)
+            const cardNumber = cardNumberInput.value.replace(/\s+/g, '');
+            if (cardNumber.length !== 16) {
+                cardNumberInput.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            // Validate CVC (exactly 3 digits)
+            if (cvcInput.value.length !== 3) {
+                cvcInput.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            // Validate expiry date (MM/YY format)
+            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiryInput.value)) {
+                expiryInput.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                e.stopPropagation();
+            } else {
+                // Create hidden field with raw card number before submission
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'rawCardNumber';
+                hiddenInput.value = cardNumber;
+                form.appendChild(hiddenInput);
+            }
+        });
+    });
+</script>
+</body>
+</html>
